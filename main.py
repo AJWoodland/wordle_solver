@@ -1,5 +1,4 @@
 import string
-import pandas
 
 def score_word(word,letter_score):
     score = 0
@@ -51,13 +50,19 @@ def filter_allowed_words(word_list,included_list,known_list):
         for char in word:
             if char in included_list:
                 letter_found = True
+        included_check = dict.fromkeys(included_list,0)
+
         for i in range(0,5):
             if word[i] == known_list[i]: #test for letter in correct space
-                letter_found = True
+                letter_found = True 
             if known_list[i] == 'null': #test if letter not known yet
                 letter_found = True
-            elif word[i] != known_list[i]:
+                if word[i] in included_list: #check if letter is included list in a free position
+                    included_check[word[i]] = 1
+            elif word[i] != known_list[i]: #letter mismatch in known position and not null
                 letter_mismatch = True
+        if 0 in included_check.values() : #check that all included letters are present in the word
+            letter_mismatch = True
         if letter_found == True and letter_mismatch == False:
             output_word_list.append(word)
     return output_word_list
@@ -91,9 +96,7 @@ def get_highest_score_word(word_values):
 def return_best_words(word_list,exclusion_list,included_list,known_list):
     word_list_exclude_removed = filter_exclude_list(word_list,exclusion_list)
     possible_word_list = filter_allowed_words(word_list_exclude_removed,included_list,known_list)
-    unknown_letter_list = exclusion_list+included_list+known_list
-    word_list_unknown = filter_exclude_list(word_list_exclude_removed,unknown_letter_list)
-
+    #determine possible words based on words which fit 
     zero_value_letters = exclusion_list+known_list
     if len(included_list) > 0:
         possible_scores, possible_count = update_scores(possible_word_list,possible_word_list,zero_value_letters)
@@ -146,8 +149,9 @@ if __name__ == "__main__":
     # return_best_words(combined_word_list,exclusion_list,included_list,known_list)
 
     exclusion_list = ['r','a','s','e','n','i','y','t','h']
-    included_list = ['o']
-    known_list = ['c','null','null','l','d']
+    included_list = ['c','o','u','l']
+    #known_list = ['c','null','null','l','d']
+    known_list = ['null']*5
 
     return_best_words(combined_word_list,exclusion_list,included_list,known_list)
 
