@@ -1,5 +1,7 @@
 import string
 
+word_length = 5
+
 def score_word(word,letter_score):
     score = 0
     alphabet_string = string.ascii_lowercase
@@ -52,7 +54,7 @@ def filter_allowed_words(word_list,included_list,known_list):
                 letter_found = True
         included_check = dict.fromkeys(included_list,0)
 
-        for i in range(0,5):
+        for i in range(0,word_length):
             if word[i] == known_list[i]: #test for letter in correct space
                 letter_found = True 
             if known_list[i] == 'null': #test if letter not known yet
@@ -93,18 +95,19 @@ def get_highest_score_word(word_values):
     return best_word
 
 
-def return_best_words(word_list,exclusion_list,included_list,known_list):
-    word_list_exclude_removed = filter_exclude_list(word_list,exclusion_list)
-    possible_word_list = filter_allowed_words(word_list_exclude_removed,included_list,known_list)
+def return_best_words(word_list,answers,exclusion_list,included_list,known_list):
+    answer_list_exclude_removed = filter_exclude_list(answers,exclusion_list)
+    answer_possible_word_list = filter_allowed_words(answer_list_exclude_removed,included_list,known_list)
+    
     #determine possible words based on words which fit 
     zero_value_letters = exclusion_list+known_list
     if len(included_list) > 0:
-        possible_scores, possible_count = update_scores(possible_word_list,possible_word_list,zero_value_letters)
+        possible_scores, possible_count = update_scores(answer_possible_word_list,answer_possible_word_list,zero_value_letters)
 
         possible_best = get_highest_score_word(possible_scores)
         possible_value = possible_scores[possible_best]
         print("Best guess: ",possible_best," - ",possible_value)    
-
+        print(possible_count," possible answers")
         if possible_count <= 10:
             print('possible words:')
             for possible_word, score in possible_scores.items():
@@ -113,17 +116,20 @@ def return_best_words(word_list,exclusion_list,included_list,known_list):
 
    
     zero_value_letters = exclusion_list+included_list+known_list
-    unknown_scores, unknown_count = update_scores(word_list,possible_word_list,zero_value_letters)    
+    unknown_scores, unknown_count = update_scores(word_list,answer_possible_word_list,zero_value_letters)    
     if unknown_count != 0:
         #print(unknown_scores)
         unknown_best = get_highest_score_word(unknown_scores)
         unknown_value = unknown_scores[unknown_best]
-        print("Best value: ",unknown_best," - ",unknown_value)
+        print("Best new letter value: ",unknown_best," - ",unknown_value)
         if unknown_count <=10:
             print("value words")
             for unknown_word, score in unknown_scores.items():
                 if score > 0:
                     print(unknown_word,' - ',score)
+
+        #best letter position value
+
 
     else:
         print("all letters determined")
@@ -142,20 +148,42 @@ if __name__ == "__main__":
 
     combined_word_list = guesses + answers
 
-    # exclusion_list = []
-    # included_list = []
-    # known_list = ['null']*5
+    #exclusion_list = []
+    #included_list = []
+    #known_list = ['null']*word_length
 
-    # return_best_words(combined_word_list,exclusion_list,included_list,known_list)
 
-    exclusion_list = ['r','a','s','e','n','i','y','t','h']
-    included_list = ['c','o','u','l']
+    exclusion_list = ['a','e','o','t','s','l','c','i','d','y']
+    included_list = ['r','u','n','g']
     #known_list = ['c','null','null','l','d']
-    known_list = ['null']*5
-
-    return_best_words(combined_word_list,exclusion_list,included_list,known_list)
+    known_list = ['null']*word_length
 
 
+    return_best_words(combined_word_list,answers,exclusion_list,included_list,known_list)
+
+
+#plans
+#take account of knowledge of letter position
+    #can determine value based on position rather than just existence
+
+    #can account for knowledge that letters returned as being present but in wrong place are excluded from that position
+
+#determine array of best value words with same score
+#pick either based on possibility of being answer
+#or on determining location of letters
+
+#determine value based on minimising number of remaining words
+    #may only be feasible once initial guesses narrow down
+
+#code a version of the game for testing, this would allow comparison of strategies,
+    #max guesses/average guesses/number of words not got within 6 guesses.
+    #code only initially
+    #GUI for playability?
+
+
+#graphical interface
+
+#automate interaction with website? reading of page and filling in of letters
 
 
 
